@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "memory-app"
+version = "0.1.0"
+description = ""
+authors = ["rbc33 <ricardobenthem@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = {extras = ["standart"], version = "^0.115.0"}
+plotly = "^5.24.1"
+pandas = "^2.2.3"
+python-dotenv = "^1.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
