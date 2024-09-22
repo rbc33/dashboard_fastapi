@@ -1,4 +1,7 @@
 from fastapi import FastAPI
+from fastapi.templating import Jinja2Templates
+from fastapi.requests import Request
+from fastapi.staticfiles import StaticFiles
 import os
 from pathlib import Path
 from dotenv import load_dotenv
@@ -6,8 +9,10 @@ from dotenv import load_dotenv
 _ = load_dotenv()
 daya = []
 DEFAULT_DIR = os.getenv("DEFAULT_DIR") 
+template = Jinja2Templates("templates")
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 def get_stats(directory: str) -> None:
@@ -26,9 +31,15 @@ async def root():
 
 
 @app.get("/read_stats")
-async def read_stats(directory: str = DEFAULT_DIR):
+async def read_stats(request: Request, directory: str = DEFAULT_DIR):
     get_stats(directory)
-    return {"data": "done"}
+    dirs = [str(dir) for dir in Path(directory).iterdir() if dir.is_dir()]
+    context = {
+        "subdirectories": dirs,
+        "current_dir": directory,
+        "parent_dir": str(Path(directory).parent)   
+    }
+    return template.TemplateResponse(request, 'base.html', context)
 
 if __name__ == "__main__":
     import uvicorn

@@ -1,0 +1,8 @@
+<ul>
+  <li>{{ parent_dir }}</li>
+  <li>{{ current_dir }}</li>
+  {% for dir in subdirectories %}
+  <li>{{ dir}}</li>
+  {% endfor %}
+  <ul></ul>
+</ul>
