@@ -1,0 +1,35 @@
+<div class="h-full">
+  <p class="text-lg text-center">Directories</p>
+  <ul class="bg-slate-200 border-solid border-r-4 border-slate-500">
+    <li
+      class="hover:text-slate-600 text-teal-800 hover:cursor-pointer my-2"
+      hx-get="read_stats"
+      hx-target="#dashboard"
+      hx-swap="outerHTML"
+      hx-vals='{"directory": "{{parent_dir}}"}'
+    >
+      {{ parent_dir }}
+    </li>
+    <li
+      class="hover:text-slate-600 text-teal-800 hover:cursor-pointer my-2 ml-4"
+      hx-get="read_stats"
+      hx-target="#dashboard"
+      hx-swap="outerHTML"
+      hx-vals='{"directory": "{{current_dir}}"}'
+    >
+      {{ current_dir }}
+    </li>
+    {% for dir in subdirectories %}
+    <li
+      class="hover:text-slate-600 text-teal-800 hover:cursor-pointer my-2 ml-8"
+      hx-get="read_stats"
+      hx-target="#dashboard"
+      hx-swap="outerHTML"
+      hx-vals='{"directory" : "{{dir}}"}'
+    >
+      {{ dir}}
+    </li>
+    {% endfor %}
+    <ul></ul>
+  </ul>
+</div>
