@@ -48,7 +48,7 @@ def get_size()->str:
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
-@app.get("/pie")
+@app.get("/pie_chart")
 async def get_pie(request: Request, amount: int = 10):
     top_ten = set(
         df
@@ -69,6 +69,19 @@ async def get_pie(request: Request, amount: int = 10):
     context = { "pie_chart": pio.to_html(fig, full_html=False) }
     return template.TemplateResponse(request, 'pie_chart.html', context)
 
+@app.get("/bad_actors")
+def get_bad_actors(request: Request, amount: int = 10):
+    print("badc_func")
+    plot_df = df.sort_values("Filesize", ascending=False).head(amount)
+    fig = px.bar(
+        plot_df,
+        "Path",
+        "Filesize"
+    )
+    fig.update_xaxes(tickangle=45)
+    context = { "bad_actors_chart": pio.to_html(fig, full_html=False) }
+    return template.TemplateResponse(request, 'bad_actors.html', context)
+    
 @app.get("/read_stats")
 async def read_stats(request: Request, directory: str = DEFAULT_DIR):
     get_stats(directory)

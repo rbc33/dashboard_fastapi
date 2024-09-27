@@ -1,0 +1,8 @@
+{% if bad_actors_chart %}
+<div>
+  <h2 class="text-center">Bad Actors</h2>
+  {{ bad_actors_chart | safe }}
+</div>
+{% else %}
+<div hx-get="/bad_actors" hx-trigger="load" hx-swap="outerHTML"></div>
+{% endif %}
