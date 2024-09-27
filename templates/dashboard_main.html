@@ -1,3 +1,8 @@
 <div class="grid grid-cols-3 gap-2" id="dashboard">
   {% include "list_dirs.html" %}
+  <div class="w-full h-full col-span-2 my-2">
+    {% include "dir_size.html" %}
+    <br />
+    {% include "pie_chart.html" %}
+  </div>
 </div>

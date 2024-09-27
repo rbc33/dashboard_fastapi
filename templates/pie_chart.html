@@ -1,0 +1,8 @@
+{% if pie_chart %}
+<div>
+  <h2 class="text-center">Memory Usage By File Extension</h2>
+  {{ pie_chart | safe }}
+</div>
+{% else %}
+<div hx-get="/pie" hx-trigger="load" hx-swap="outerHTML"></div>
+{% endif %}

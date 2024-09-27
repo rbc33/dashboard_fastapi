@@ -5,9 +5,14 @@ from fastapi.staticfiles import StaticFiles
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import plotly.io as pio
 
 _ = load_dotenv()
-daya = []
+data = []
+df : pd.DataFrame
 DEFAULT_DIR = os.getenv("DEFAULT_DIR") 
 template = Jinja2Templates("templates")
 
@@ -23,12 +28,46 @@ def get_stats(directory: str) -> None:
             file = os.path.join(directory, file)
             if not os.path.islink(file):
                 data.append([file, os.path.getsize(file), Path(file).suffix[1:]])
+    global df
+    df = pd.DataFrame(data, columns=["Path", "Filesize", "Extension"])
+    
+def get_size()->str:
+    size = df.Filesize.sum()
+    if size < 1024:
+        size = f"{size} bytes"
+    elif size < 1024**2:
+        size = f"{size//1024} kb"
+    elif size < 1024**3:
+        size = f"{size//(1024**2)} mb"
+    else:
+        size = f"{size//(1024**3)} gb"
+    return size
+
 
 
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
-
+@app.get("/pie")
+async def get_pie(request: Request, amount: int = 10):
+    top_ten = set(
+        df
+        .groupby('Extension')
+        .Filesize.sum()
+        .sort_values(ascending=False)
+        .head(amount)
+        .index
+    )
+    df.loc[:,'Top_Ten'] = df.eval('Extension in @top_ten')
+    plot_df = ( 
+            df.assign(Extension = lambda x:np.where(x.Top_Ten, x.Extension, "Other"))
+            .groupby("Extension")
+            .Filesize.sum()
+            .reset_index()
+        )
+    fig = px.pie(plot_df, names="Extension", values="Filesize")
+    context = { "pie_chart": pio.to_html(fig, full_html=False) }
+    return template.TemplateResponse(request, 'pie_chart.html', context)
 
 @app.get("/read_stats")
 async def read_stats(request: Request, directory: str = DEFAULT_DIR):
@@ -37,7 +76,8 @@ async def read_stats(request: Request, directory: str = DEFAULT_DIR):
     context = {
         "subdirectories": dirs,
         "current_dir": directory,
-        "parent_dir": str(Path(directory).parent)   
+        "parent_dir": str(Path(directory).parent),
+        "dir_size":  get_size()
     }
     return template.TemplateResponse(request, 'base.html', context)
 
